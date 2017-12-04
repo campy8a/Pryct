@@ -61,7 +61,7 @@
       const yValue = d => d.Counts;
       const yLabel = 'Millones invertidos';
       const colorValue = d=>  d.CIUDAD;
-      const colorLabel = 'Countries';
+      const colorLabel = 'Ciudades';
       const margin = { left: 120, right: 120, top: 20, bottom: 120 };
 
       const svg = d3.select("body").append("svg")
@@ -85,15 +85,8 @@
       var temp = d3.select('body').append('div')  
         .attr('class', 'tooltip')       
         .style('opacity', 0);
-      
-      
-      g.append('text')
-        .attr('class', 'subtitle')
-        .attr('x', 0)
-        .attr('y', margin.top-50)
-        .style('font-weight', 'bold')
-        .text('Elefantes Blancos según el SECOP');
-      
+     
+      var numberFormat = d3.format(",d");
       
       xAxisG.append('text')
           .attr('class', 'axis-label')
@@ -148,10 +141,6 @@
               .append("option")
               .text(function(d){return d;})
               .attr("value",function(d){ return d;});
-              
-            
-      
-          
 
         xScale
           .domain(d3.extent(data, xValue))
@@ -172,9 +161,69 @@
         g.selectAll('circle').data(data)
           .enter().append('circle')
           //filtro de datos
-         //.filter(function (d){
+         
+            .attr('cx', d => xScale(xValue(d)))
+            .attr('cy', d => yScale(yValue(d)))
+            .attr('fill', d => colorScale(colorValue(d)))
+            .attr('Country', d=>d.CIUDAD)
+            .attr('fill-opacity', 0.6)
+            .attr('r', 5)
+            .attr('opacity',1)
+            
+            //funciones
+            .on("click", function(d)
+            {
+              window.open(d.Link);
+            })
+            .on("mouseover", function(d) {
+            temp.transition()   
+                .duration(200)    
+                .style("opacity", 1);   
+            temp.html("  millones:  $"+numberFormat(parseInt(d.Counts))+"<br/>Fecha entrega:  "+ d.DATE_DUE+ "<br/> Fecha entregado:  "+d.DATE_DELIVERED)  
+               .style("left", (d3.event.pageX - 60) + "px")   
+               .style("top", (d3.event.pageY + 20) + "px");
+            })
+            .on("mouseout", function(d) {   
+              temp.transition()   
+                 .duration(500)   
+                .style("opacity", 0); 
+              });     
+
+
+        xAxisG.call(xAxis);
+        yAxisG.call(yAxis);
+        colorLegendG.call(colorLegend)
+          .selectAll('.cell text')
+            .attr('dy', '0.1em'); 
+
+
+      });
+
+        //function EXIT
+       
+      function cambio()
+      {
+        
+        selectValue = d3.select('select').property('value')
+        d3.selectAll('circle').remove();
+        d3.selectAll('text.label').remove();
+
+        console.log(selectValue);
+         
+        colorLegendG.append('text')
+          .attr('class', 'label')
+          .attr('x', -30)
+          .attr('y', function(d,i){ return(i*-20)})
+          .text(selectValue)
+
+        d3.csv('proyectos.csv', data => {
+          //create Basic Circles
+        g.selectAll('circle').data(data)
+          .enter().append('circle')
+          //filtro de datos
+         .filter(function (d){
           // console.log(d.CIUDAD==e);
-         // return d.CIUDAD == e; })         //})
+          return d.CIUDAD == selectValue; })         //})
           //atributos
             .attr('cx', d => xScale(xValue(d)))
             .attr('cy', d => yScale(yValue(d)))
@@ -212,19 +261,8 @@
 
       });
 
-        //function EXIT
-       
-      function cambio()
-      {
-        
-        var selecto =document.getElementById("ciudades");
-        var e = selecto.options[selecto.selectedIndex].text;
-        console.log(e);
 
-        g.selectAll('circle').filter(function(d){return d.CIUDAD=e});
-        
-
-      }
+      };
 
           //funcion del boton
             
