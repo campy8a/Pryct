@@ -105,18 +105,21 @@
 
     <div id=header></div>
 <div id="tittle">
-  <h1> <span> Contratos retrasados:</br>
-  Cuanto dinero en circulación</span></h1>
+  <h1> <span> Late contracts:</br>
+  Where is the fee?</span></h1>
 </div>
 <div id="description">
   <p>
-  Utilizando los datos proporcionados por el gobierno a través del SECOP pudimos determinar que no todos los contratos acaban cuando se estipula en el papel. <br>
-    Incluso con extensiones de contrato,estos tiempos no se cumplen,dejando millones de pesos libres, posiblemente obras inconclusas y sin multas a los contratistas. <br>
-    Este es un registro de las obras registradas que econtramos como tarde y el dinero TOTAL invertido en estas a partir del año de firma de los contratos.
+ Using the data given by the government through SECOP we could determine that not all contracts end like what it's written on paper.<br> 
+    Even with extentions in time, this contracts are not delivered in time, leaving millions of pesos without it's proper use, or leaving unfinished constructions. <br>
+    Economical fees are nowhere to be found to the contractors.
+
+    <br>
+   This is a viz on the entries of the constructions we found as late and the TOTAL amount of money invested on this contracts since they have been signed.
   </p>
   </div>
   <div >
-  <p id="FILTRO">FILTRO - Municipios registrados</p>
+  <p id="FILTRO">Filter - Registered Municipalities</p>
   <select id="ciudades" onChange="cambio()">
     <Option>--</Option>
   </select>
@@ -130,9 +133,9 @@
 
       const parseTime = d3.timeParse("%Y");
       const xValue = d => parseTime(d.Year);
-      const xLabel = 'Año';
+      const xLabel = 'Year';
       const yValue = d => d.Counts;
-      const yLabel = 'Millones invertidos';
+      const yLabel = 'Millions Invested';
       const colorValue = d=>  d.CIUDAD;
       const colorLabel = 'Ciudades';
       const margin = { left: 120, right: 120, top: 20, bottom: 120 };
@@ -208,7 +211,12 @@
           .attr('class', 'axis-label')
           .attr('x', innerWidth-50)
           .attr('y', 50)
-          .text("FUENTE DE DATOS: SECOP I");  
+          .text("Data Source: SECOP I");  
+       xAxisG.append('text')
+          .attr('class', 'axis-label')
+          .attr('x', innerWidth-700)
+          .attr('y', 50)
+          .text("It's considered late as 10 days after the contract due date."); 
 
       d3.csv('proyectos.csv', data => {
 
@@ -257,7 +265,7 @@
             temp.transition()   
                 .duration(200)    
                 .style("opacity", 1);   
-            temp.html("Municipio: "+ d.CIUDAD+ "<br>  Millones:  $"+numberFormat(parseFloat(d.Counts))+"<br/>Fecha entrega:  "+ d.DATE_DUE+ "<br/> Fecha entregado:  "+d.DATE_DELIVERED)  
+            temp.html("Municipio: "+ d.CIUDAD+ "<br>  Millions:  $"+numberFormat(parseFloat(d.Counts))+"<br/>Due date:  "+ d.DATE_DUE+ "<br/> Date delivered:  "+d.DATE_DELIVERED)  
                .style("left", (d3.event.pageX - 60) + "px")   
                .style("top", (d3.event.pageY + 20) + "px");
             })
@@ -318,7 +326,7 @@
             temp.transition()   
                 .duration(200)    
                 .style("opacity", 1);   
-            temp.html("  millones:  $"+numberFormat(parseFloat(d.Counts))+"<br/>Fecha entrega:  "+ d.DATE_DUE+ "<br/> Fecha entregado:  "+d.DATE_DELIVERED)  
+            temp.html(" millions:  $"+numberFormat(parseFloat(d.Counts))+"<br/>Due date:  "+ d.DATE_DUE+ "<br/> Date delivered: "+d.DATE_DELIVERED)  
                .style("left", (d3.event.pageX - 60) + "px")   
                .style("top", (d3.event.pageY + 20) + "px");
             })
