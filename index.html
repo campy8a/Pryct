@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta charset="ANSI">
     <meta name="viewport" content="width=device-width">
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700" rel="stylesheet">
@@ -17,6 +18,8 @@
         font-family: 'Open Sans', sans-serif;
         overflow: auto!important;
         max-height: 300px;
+        color:BLACK;
+        overflow:   scroll;
       }
       
       .axis-label, .legend-label {
@@ -25,6 +28,8 @@
         font-family: 'Open Sans', sans-serif;
         overflow: auto!important;
         max-height: 300px;
+        color:BLACK;
+        overflow:   scroll;
       }
       .subtitle {
         font-size: 40pt;
@@ -46,13 +51,81 @@
         background: WHITE;  
         border: 0px;    
         border-radius: 8px;     
-        pointer-events: none;     
+        pointer-events: none;   
+        color:BLACK;  
     }
+
+    body { 
+    font-family: 'Oswald', sans-serif;
+    font: 30px;
+    color: WHITE;
+    text-align: center;
+    background-color: #212121;
+    }
+      p
+      {
+        font-family: 'Oswald', sans-serif;
+       font: 30px;
+        color: WHITE;
+        text-align: center;
+        background-color: #212121;
+      }
+    svg
+    {
+      background-color:WHITE;
+    }
+    
+    h1{
+        font-weight:600;
+        font-size: 50px;
+        text-align: center;
+        color: WHITE;
+      }
+
+      #FILTRO
+      {
+        font-size: 30px;
+      }
+      #graph
+      {
+        text-align:   left;
+        background-color:   WHITE;
+      }
+      
+      select
+      {
+        font-size:30px;
+      }
+      
+
       
     </style>
   </head>
   <body>
-    <select id=ciudades onchange="cambio()"></select>
+
+    <div id=header></div>
+<div id="tittle">
+  <h1> <span> Contratos retrasados:</br>
+  Cuanto dinero en circulación</span></h1>
+</div>
+<div id="description">
+  <p>
+  Utilizando los datos proporcionados por el gobierno a través del SECOP pudimos determinar que no todos los contratos acaban cuando se estipula en el papel. <br>
+    Incluso con extensiones de contrato,estos tiempos no se cumplen,dejando millones de pesos libres, posiblemente obras inconclusas y sin multas a los contratistas. <br>
+    Este es un registro de las obras registradas que econtramos como tarde y el dinero TOTAL invertido en estas a partir del año de firma de los contratos.
+  </p>
+  </div>
+  <div >
+  <p id="FILTRO">FILTRO - Municipios registrados</p>
+  <select id="ciudades" onChange="cambio()">
+    <Option>--</Option>
+  </select>
+</div>
+
+
+<div id="space"></div>
+
+<div id="graph">
     <script>
 
       const parseTime = d3.timeParse("%Y");
@@ -64,9 +137,9 @@
       const colorLabel = 'Ciudades';
       const margin = { left: 120, right: 120, top: 20, bottom: 120 };
 
-      const svg = d3.select("body").append("svg")
-        .attr("width", 1500)
-        .attr("height", 700);
+      const svg = d3.select("#graph").append("svg")
+        .attr("width", 1100)
+        .attr("height", 600);
       
       const width = svg.attr('width');
       const height = svg.attr('height');
@@ -74,13 +147,13 @@
       const innerHeight = 650 - margin.top - margin.bottom;
 
       const g = svg.append('g')
-          .attr('transform', `translate(${margin.left},${margin.top+50})`);
+          .attr('transform', `translate(${margin.left},${margin.top})`);
       const xAxisG = g.append('g')
           .attr('transform', `translate(0, ${innerHeight})`);
       const yAxisG = g.append('g');
 
       const colorLegendG = g.append('g')
-          .attr('transform', `translate(${innerWidth + 100}, 50)`);
+          .attr('transform', `translate(${innerWidth + 100},0)`);
 
       var temp = d3.select('body').append('div')  
         .attr('class', 'tooltip')       
@@ -97,7 +170,7 @@
       yAxisG.append('text')
           .attr('class', 'axis-label')
           .attr('x', -innerHeight / 2)
-          .attr('y', -60)
+          .attr('y', 20)
           .attr('transform', `rotate(-90)`)
           .style('text-anchor', 'middle')
           .text(yLabel);
@@ -113,11 +186,11 @@
       const yScale = d3.scaleLinear();
       const rScale = d3.scaleLinear();
       const colorScale = d3.scaleOrdinal()
-        .range(d3.schemeCategory20);
+        .range(d3.schemeCategory10);
 
       const xAxis = d3.axisBottom()
         .scale(xScale)
-        .ticks(5)
+        .ticks(7)
         .tickPadding(5)
         .tickSize(5);
 
@@ -131,11 +204,17 @@
         .scale(colorScale)
         .shape('circle');
 
-      
-      
+       xAxisG.append('text')
+          .attr('class', 'axis-label')
+          .attr('x', innerWidth-50)
+          .attr('y', 50)
+          .text("FUENTE DE DATOS: SECOP I");  
+
       d3.csv('proyectos.csv', data => {
 
-         d3.select("#ciudades").selectAll("option")
+          data.Count = parseFloat (data.Count)
+
+         d3.select('select').selectAll("option")
               .data(d3.map(data, function(d){return d.CIUDAD;}).keys())
               .enter()
               .append("option")
@@ -148,7 +227,7 @@
           .nice();
 
         yScale
-          .domain(d3.extent(data, yValue))
+          .domain([0, 300000000000])
           .range([innerHeight, 0])
           .nice();
         
@@ -161,12 +240,11 @@
         g.selectAll('circle').data(data)
           .enter().append('circle')
           //filtro de datos
-         
+            .attr('id',d=>d.ID)
             .attr('cx', d => xScale(xValue(d)))
             .attr('cy', d => yScale(yValue(d)))
             .attr('fill', d => colorScale(colorValue(d)))
             .attr('Country', d=>d.CIUDAD)
-            .attr('fill-opacity', 0.6)
             .attr('r', 5)
             .attr('opacity',1)
             
@@ -179,7 +257,7 @@
             temp.transition()   
                 .duration(200)    
                 .style("opacity", 1);   
-            temp.html("  millones:  $"+numberFormat(parseInt(d.Counts))+"<br/>Fecha entrega:  "+ d.DATE_DUE+ "<br/> Fecha entregado:  "+d.DATE_DELIVERED)  
+            temp.html("Municipio: "+ d.CIUDAD+ "<br>  Millones:  $"+numberFormat(parseFloat(d.Counts))+"<br/>Fecha entrega:  "+ d.DATE_DUE+ "<br/> Fecha entregado:  "+d.DATE_DELIVERED)  
                .style("left", (d3.event.pageX - 60) + "px")   
                .style("top", (d3.event.pageY + 20) + "px");
             })
@@ -192,9 +270,8 @@
 
         xAxisG.call(xAxis);
         yAxisG.call(yAxis);
-        colorLegendG.call(colorLegend)
-          .selectAll('.cell text')
-            .attr('dy', '0.1em'); 
+        colorLegendG.remove();
+            
 
 
       });
@@ -241,7 +318,7 @@
             temp.transition()   
                 .duration(200)    
                 .style("opacity", 1);   
-            temp.html("  millones:  $"+d.Counts+"<br/>Fecha entrega:  "+ d.DATE_DUE+ "<br/> Fecha entregado:  "+d.DATE_DELIVERED)  
+            temp.html("  millones:  $"+numberFormat(parseFloat(d.Counts))+"<br/>Fecha entrega:  "+ d.DATE_DUE+ "<br/> Fecha entregado:  "+d.DATE_DELIVERED)  
                .style("left", (d3.event.pageX - 60) + "px")   
                .style("top", (d3.event.pageY + 20) + "px");
             })
