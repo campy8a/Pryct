@@ -44,7 +44,7 @@
         position: absolute;     
         text-align: center;     
         width: 150px;         
-        height: 180px;
+        height: 220px;
         vertical-align: middle;
         line-height: 30px;
         font-family:'Open Sans', sans-serif;
@@ -265,7 +265,7 @@
             temp.transition()   
                 .duration(200)    
                 .style("opacity", 1);   
-            temp.html("Municipio: "+ d.CIUDAD+ "<br>  Millions:  $"+numberFormat(parseFloat(d.Counts))+"<br/>Due date:  "+ d.DATE_DUE+ "<br/> Date delivered:  "+d.DATE_DELIVERED)  
+            temp.html("Municipality: "+ d.CIUDAD+ "<br>  Millions:  $"+numberFormat(parseFloat(d.Counts))+"<br/>Due date:  "+ d.DATE_DUE+ "<br/> Date delivered:  "+d.DATE_DELIVERED)  
                .style("left", (d3.event.pageX - 60) + "px")   
                .style("top", (d3.event.pageY + 20) + "px");
             })
